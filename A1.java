@@ -10,6 +10,7 @@
 import java.io.File;  // Import the File class
 import java.io.FileNotFoundException;  // Import this class to handle errors
 import java.util.Scanner; // Import the Scanner class to read text files
+import java.util.ArrayList;
 
 public class A1 
 {
@@ -17,13 +18,18 @@ public class A1
   {
     try 
     {
+      int dispatcher;
+      ArrayList<Process> data = new ArrayList<Process>();
       File file = new File(args[0]);
       Scanner sc = new Scanner(file);
 
       while (sc.hasNextLine()) 
       {
-        String data = sc.nextLine();
-        System.out.println(data);
+        if(sc.next() == "DISP:")
+        {
+          dispatcher = sc.nextInt();
+        }
+        sc.next();
       }
       sc.close();
     } catch (FileNotFoundException e) 

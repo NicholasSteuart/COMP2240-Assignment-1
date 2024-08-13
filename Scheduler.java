@@ -8,9 +8,13 @@
 
 // PACKAGES //
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 public interface Scheduler 
 {
-    public Process dispatch(Process runningProcess, ArrayList<Process> readyQueue);
+    public void admit();
+    public Process dispatch();
     public void run();
+    public ArrayList<Process> getProcessList();
+    public LinkedHashMap<Integer, String> getDispatchTimes();
 }

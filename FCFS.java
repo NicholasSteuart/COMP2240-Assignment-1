@@ -7,67 +7,110 @@
  */
 
  // PACKAGES //
- import java.util.ArrayList;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 
 public class FCFS implements Scheduler 
 {
     // CLASS VARIABLES //
-
-    private ArrayList<Process> readyQueue;
+    private ArrayList<Process> processList;
+    private ArrayList<Process> readyQueue = new ArrayList<Process>();
     private ArrayList<Process> finishedQueue = new ArrayList<Process>();
+    private LinkedHashMap<Integer, String> dispatchTimes = new LinkedHashMap<Integer, String>();
     private int dispatcher;
     private int timer = 0;
 
     // CONSTRUCTORS //
-
     //Pre-condition:
     //Post-condition:
     public FCFS() 
     {
-        readyQueue = new ArrayList<Process>();
+        processList = new ArrayList<Process>();
         dispatcher = 0;
     }
     //Pre-condition:
     //Post-condition:
-    public FCFS(ArrayList<Process> readyQueue, int dispatcher)
+    public FCFS(ArrayList<Process> processList, int dispatcher)
     {
-        this.readyQueue = readyQueue;
+        this.processList = processList;
         this.dispatcher = dispatcher;
     }
 
-    // FUNCTIONS //
-
+    // METHODS //
     //Pre-condition:
     //Post-condition:
-    public Process dispatch(Process runningProcess, ArrayList<Process> readyQueue) 
+    public void admit()
     {
-        int t1 = timer; 
-        Process nextProcess = new Process();
-    
-        for(Process process: readyQueue)
+        ArrayList<Process> admitQueue = new ArrayList<Process>();
+        for(Process process: processList)
         {
-            //Avoiding infinite loop
-            if(process.getPID() == runningProcess.getPID())
+            if(process.getArrTime() <= timer)
             {
-                continue;
+                admitQueue.add(process);
             }
-            //ii.Dispatcher will not consider any process that arrives after t1
-            if(process.getArrTime() > t1)
-            {
-                continue;
-            }
-            //iii. Not required for non-preemptive policy.
-
-            //Implement iv.
         }
-
+        for(int i = 0; i < admitQueue.size(); i++)
+        {
+            int processID = Integer.parseInt(admitQueue.get(i).getPID().substring(0));
+            for(int j = i + 1; j < admitQueue.size(); j++)
+            {
+                int processID2 = Integer.parseInt(admitQueue.get(j).getPID().substring(0));
+                if(processID > processID2)
+                {
+                    Collections.swap(admitQueue, i, j);
+                }
+            }
+        }
+        for(Process process: admitQueue)
+        {
+            readyQueue.add(process);
+            processList.remove(process);
+        }
+    }
+    //Pre-condition:
+    //Post-condition:
+    public Process dispatch()
+    {
+        Process nextProcess = readyQueue.get(0);
+        readyQueue.remove(0);
         timer += dispatcher;
+        dispatchTimes.put(timer, nextProcess.getPID());
         return nextProcess;
     }
     //Pre-condition:
     //Post-condition:
     public void run() 
     {
-        
+        int t1;
+        while(processList.size() != 0)
+        {
+            admit();
+            Process runningProcess = dispatch();
+            t1 = timer;
+            runningProcess.setWaitTime(t1);
+            while(runningProcess.getSrvTime() > timer-t1)
+            {
+                timer++;
+            }
+            runningProcess.setTurnTime(timer-runningProcess.getArrTime());
+            finishedQueue.add(runningProcess);
+        }
+        finishedQueue.sort(null);
+        processList = finishedQueue;
+    }
+    
+    // ACCESSORS //
+    //Pre-condition:
+    //Post-condition:
+    public ArrayList<Process> getProcessList()
+    {
+        return processList;
+    }
+    //Pre-condition:
+    //Post-condition:
+    public LinkedHashMap<Integer, String> getDispatchTimes()
+    {
+        return dispatchTimes;
     }
 }
