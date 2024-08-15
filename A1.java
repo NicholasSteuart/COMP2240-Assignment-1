@@ -7,32 +7,41 @@
  */
 
 // PACKAGES //
-import java.io.File;  // Import the File class
-import java.io.FileNotFoundException;  // Import this class to handle errors
-import java.util.Scanner; // Import the Scanner class to read text files
+import java.io.EOFException;
+import java.io.File; 
+import java.io.FileNotFoundException;  
+import java.util.Scanner; 
 import java.util.ArrayList;
 
 public class A1 
 {
-  public static void main(String[] args) throws FileNotFoundException
+  public static void main(String[] args) throws Exception
   {
-    File file = new File(args[0]);
-    Scanner sc = new Scanner(file);
-
-    ArrayList<Process> data = new ArrayList<Process>();
-    int dispatcher = 0;
-    Process newProcess;
-
-    // READING IN FILE //
-    if(sc.hasNext("BEGIN"))
+    try 
     {
-      sc.next();
-      if(sc.hasNext("DISP:"))
+      File file = new File(args[0]);
+      Scanner sc = new Scanner(file);
+
+      ArrayList<Process> data = new ArrayList<Process>();
+      int dispatcher = 0;
+      Process newProcess;
+
+      // READING IN FILE //
+      if(sc.hasNext("BEGIN"))
       {
         sc.next();
-        dispatcher = sc.nextInt();
-        sc.next();
+        if(sc.hasNext("DISP:"))
+        {
+          sc.next();
+          dispatcher = sc.nextInt();
+          if(dispatcher < 0)
+          {
+            throw new Exception("DISP must be a non-negative Integer");
+          }
+          sc.next();
+        }
       }
+      int prevIndex = 0;
       do
       {
         String pID = "";
@@ -41,53 +50,74 @@ public class A1
         {
           sc.next();
           pID = sc.next();
+          int currIndex = Integer.parseInt(pID.substring(1));
+          if(pID.charAt(0) != 'p' || pID.charAt(1) <= 0 || prevIndex != currIndex-1)
+          {
+            throw new Exception("PID must be of the form pn where n is a positive integer");
+          }
+          prevIndex++;
         }
         if(sc.hasNext("ArrTime:"))
         {
           sc.next();
           arrTime = sc.nextInt();
+          if(arrTime < 0)
+          {
+            throw new Exception("ArrTime must be a non-negative integer");
+          }
         }
         if(sc.hasNext("SrvTime:"))
         {
           sc.next();
           srvTime = sc.nextInt();
+          if(srvTime <= 0)
+          {
+            throw new Exception("SrvTime must be a positive integer");
+          }
         }
         if(sc.hasNext("Tickets:"))
         {
           sc.next();
           tickets = sc.nextInt();
+          if(tickets <= 0)
+          {
+            throw new Exception("Tickets must be a positive integer");
+          }
         }
         newProcess = new Process(pID, arrTime, srvTime, tickets);
-        //System.out.println("NEW PROCESS CREATED: PID: " + newProcess.getPID() + " ARRTIME: " + newProcess.getArrTime() + " SRVTIME: " + newProcess.getSrvTime() + " TICKETS: " + newProcess.getTickets());
         data.add(newProcess);
         sc.next();
       }
       while(!sc.hasNext("BEGINRANDOM"));
+
+      //TODO: IMPLEMENT RANDOM
+
+      sc.close();
+
+      // OUTPUT //
+      FCFS fcfs = new FCFS(data, dispatcher);
+      SRT srt = new SRT(data, dispatcher);
+      FBV fbv = new FBV(data, dispatcher);
+      LTR ltr = new LTR(data, dispatcher);
+
+      //fcfs.run();
+      //srt.run();
+      //fbv.run();
+      //ltr.run();
+      
+      System.out.print(printResults(fcfs));
+      System.out.print(printResults(srt));
+      System.out.print(printResults(fbv));
+      System.out.print(printResults(ltr));
+      System.out.print(printSummary(fcfs, srt, fbv, ltr));
+    } 
+    catch(FileNotFoundException e)
+    {
+      System.out.println("File " + args[0] + "was not found");
+      e.printStackTrace();
     }
-    sc.close();
-
-
-    FCFS fcfs = new FCFS(data, dispatcher);
-    SRT srt = new SRT(data, dispatcher);
-    FBV fbv = new FBV(data, dispatcher);
-    LTR ltr = new LTR(data, dispatcher);
-
-    // RUN SCHEDULING ALGORITHMS //
-    fcfs.run();
-    //srt.run();
-    //fbv.run();
-    //ltr.run();
-
-    // OUTPUT //
-
-    System.out.print(printResults(fcfs));
-    System.out.print(printResults(srt));
-    System.out.print(printResults(fbv));
-    System.out.print(printResults(ltr));
-    System.out.print(printSummary(fcfs, srt, fbv, ltr));
-
   }
-  
+
   // METHODS //
   //Pre-condition:
   //Post-condition:
