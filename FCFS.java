@@ -13,9 +13,8 @@ public class FCFS extends Scheduler
 {
     // CLASS VARIABLES //
     private ArrayList<Process> enterQueue;
-    private ArrayList<Process> readyQueue = new ArrayList<Process>();
     private ArrayList<Process> finishedQueue = new ArrayList<Process>();
-    private int dispatcher;
+    private final int DISPATCHER;
     private int timer = 0;
     private String name = "FCFS";
 
@@ -25,53 +24,63 @@ public class FCFS extends Scheduler
     public FCFS() 
     {
         enterQueue = new ArrayList<Process>();
-        dispatcher = 0;
+        DISPATCHER = 0;
     }
     //Pre-condition:
     //Post-condition:
-    public FCFS(ArrayList<Process> enterQueue, int dispatcher)
+    public FCFS(ArrayList<Process> enterQueue, int DISPATCHER)
     {
         this.enterQueue = enterQueue;
-        this.dispatcher = dispatcher;
+        this.DISPATCHER = DISPATCHER;
     }
 
     // METHODS //
     //Pre-condition:
     //Post-condition:
     @Override
-    public void admit()
-    {
-        /*for(Process process: enterQueue)
-        {
-            if(process.getArrTime() <= timer)
-            {
-                readyQueue.add(process);
-                System.out.println("PROCESS ADDED TO READY QUEUE: PID: " + process.getPID() + " ARRTIME: " + process.getArrTime() + " SRVTIME: " + process.getSrvTime() + " TICKETS: " + process.getTickets());
-            }
-        }
-        System.out.println("\n");*/
-    }
-    //Pre-condition:
-    //Post-condition:
-    @Override
     public Process dispatch()
     {
-        Process nextProcess = readyQueue.get(0);
-        /*readyQueue.remove(0);
-        timer += dispatcher;
-        String dispatchLog = "T" + timer + ": " + nextProcess.getPID();
-        dispatchLogs.add(dispatchLog);*/
-        return nextProcess;
+        //Assume the first process has the earliest arrival time
+        int earliestArrTime = enterQueue.get(0).getArrTime();
+        int nextDispatchIndex = 0;
+        for(int i = 0; i < enterQueue.size(); i++)
+        {
+            //If another process has arrived earlier
+            if(enterQueue.get(i).getArrTime() < earliestArrTime)
+            {
+                earliestArrTime = enterQueue.get(i).getArrTime();
+                nextDispatchIndex = i;
+            }
+
+            //If two process have the same arrival time
+            if(enterQueue.get(i).getArrTime() == earliestArrTime)
+            {
+                int id1 = Integer.parseInt(enterQueue.get(i).getPID().substring(1));
+                int id2 = Integer.parseInt(enterQueue.get(nextDispatchIndex).getPID().substring(1));
+
+                if(id1 < id2)
+                {
+                    earliestArrTime = enterQueue.get(i).getArrTime();
+                    nextDispatchIndex = i;
+                }
+            }
+        }
+
+        timer += DISPATCHER;
+        Process nextDispatch = enterQueue.get(nextDispatchIndex);
+        //Log the next running process's time and process ID
+        String nextDispatchLog = "T" + timer + ": " + nextDispatch.getPID();
+        dispatchLogs.add(nextDispatchLog);
+        return nextDispatch;
     }
     //Pre-condition:
     //Post-condition:
     @Override
     public void run() 
     {
-        /*int t1;
-        while(enterQueue.size() > finishedQueue.size())
+        int t1;
+        while(enterQueue.size() != 0)
         {
-            admit();
             Process runningProcess = dispatch();
             t1 = timer;
             runningProcess.setWaitTime(t1);
@@ -81,7 +90,8 @@ public class FCFS extends Scheduler
             }
             runningProcess.setTurnTime(timer-runningProcess.getArrTime());
             finishedQueue.add(runningProcess);
-        }*/
+            enterQueue.remove(runningProcess);
+        }
     }
     
     // ACCESSORS //

@@ -7,7 +7,6 @@
  */
 
 // PACKAGES //
-import java.io.EOFException;
 import java.io.File; 
 import java.io.FileNotFoundException;  
 import java.util.Scanner; 
@@ -100,7 +99,7 @@ public class A1
       FBV fbv = new FBV(data, dispatcher);
       LTR ltr = new LTR(data, dispatcher);
 
-      //fcfs.run();
+      fcfs.run();
       //srt.run();
       //fbv.run();
       //ltr.run();

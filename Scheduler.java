@@ -14,10 +14,8 @@ abstract class Scheduler
     ArrayList<String> dispatchLogs = new ArrayList<String>();
 
     // ABSTRACT METHODS //
-    abstract public void admit();
     abstract public Process dispatch();
     abstract public void run();
-
     abstract public String getName();
     abstract public ArrayList<Process> getFinishedQueue();
     abstract public ArrayList<String> getDispatchLogs();
