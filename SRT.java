@@ -15,7 +15,7 @@ public class SRT extends Scheduler
     private ArrayList<Process> enterQueue;
     private ArrayList<Process> readyQueue = new ArrayList<Process>();
     private ArrayList<Process> finishedQueue = new ArrayList<Process>();
-    private int DISPATCHER;
+    private final int DISPATCHER;
     private int timer = 0;
     private String name = "SRT";
     private boolean[] visited;

@@ -15,7 +15,7 @@ public class LTR extends Scheduler
     private ArrayList<Process> enterQueue;
     private ArrayList<Process> readyQueue = new ArrayList<Process>();
     private ArrayList<Process> finishedQueue = new ArrayList<Process>();
-    private int dispatcher;
+    private final int DISPATCHER;
     private int timer = 0;
     private String name = "LTR";
 
@@ -25,14 +25,14 @@ public class LTR extends Scheduler
     public LTR() 
     {
         enterQueue = new ArrayList<Process>();
-        dispatcher = 0;
+        DISPATCHER = 0;
     }
     //Pre-condition:
     //Post-condition:
     public LTR(ArrayList<Process> enterQueue, int dispatcher)
     {
         this.enterQueue = enterQueue;
-        this.dispatcher = dispatcher;
+        this.DISPATCHER = dispatcher;
     }
 
     // METHODS //
