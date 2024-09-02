@@ -13,10 +13,12 @@ public class FCFS extends Scheduler
 {
     // CLASS VARIABLES //
     private ArrayList<Process> enterQueue;
+    private ArrayList<Process> readyQueue = new ArrayList<Process>();
     private ArrayList<Process> finishedQueue = new ArrayList<Process>();
     private final int DISPATCHER;
     private int timer = 0;
     private String name = "FCFS";
+    private boolean[] visited;
 
     // CONSTRUCTORS //
     //Pre-condition:
@@ -25,6 +27,7 @@ public class FCFS extends Scheduler
     {
         enterQueue = new ArrayList<Process>();
         DISPATCHER = 0;
+        visited = new boolean[0];
     }
     //Pre-condition:
     //Post-condition:
@@ -32,6 +35,7 @@ public class FCFS extends Scheduler
     {
         this.enterQueue = enterQueue;
         this.DISPATCHER = DISPATCHER;
+        visited = new boolean[enterQueue.size()];
     }
 
     // METHODS //
@@ -40,38 +44,61 @@ public class FCFS extends Scheduler
     @Override
     public Process dispatch()
     {
-        //Assume the first process has the earliest arrival time
-        int earliestArrTime = enterQueue.get(0).getArrTime();
-        int nextDispatchIndex = 0;
+        admit();
+        Process nextDispatch = findFCFS();
+        timer += DISPATCHER;
+        //Log the next running process's time and process ID
+        String nextDispatchLog = "T" + timer + ": " + nextDispatch.getPID();
+        dispatchLogs.add(nextDispatchLog);
+
+        return nextDispatch;
+    }
+    //Pre-condition:
+    //Post-condition:
+    public void admit()
+    {
         for(int i = 0; i < enterQueue.size(); i++)
         {
+            if(enterQueue.get(i).getArrTime() <= timer && !visited[i])
+            {
+                readyQueue.add(enterQueue.get(i));
+                visited[i] = true;
+            } 
+        }
+    }
+    //Pre-condition:
+    //Post-condition:
+    public Process findFCFS()
+    {
+        int earliestArrTime = Integer.MAX_VALUE;
+        int nextDispatchIndex = 0;
+
+        for(int i = 0; i < readyQueue.size(); i++)
+        {
             //If another process has arrived earlier
-            if(enterQueue.get(i).getArrTime() < earliestArrTime)
+            if(readyQueue.get(i).getArrTime() < earliestArrTime && !visited[i])
             {
                 earliestArrTime = enterQueue.get(i).getArrTime();
+                visited[i] = true;
                 nextDispatchIndex = i;
             }
 
             //If two process have the same arrival time
-            if(enterQueue.get(i).getArrTime() == earliestArrTime)
+            if(readyQueue.get(i).getArrTime() == earliestArrTime && !visited[i])
             {
-                int id1 = Integer.parseInt(enterQueue.get(i).getPID().substring(1));
-                int id2 = Integer.parseInt(enterQueue.get(nextDispatchIndex).getPID().substring(1));
+                int id1 = Integer.parseInt(readyQueue.get(i).getPID().substring(1));
+                int id2 = Integer.parseInt(readyQueue.get(nextDispatchIndex).getPID().substring(1));
 
                 if(id1 < id2)
                 {
                     earliestArrTime = enterQueue.get(i).getArrTime();
+                    visited[i] = true;
                     nextDispatchIndex = i;
                 }
             }
         }
 
-        timer += DISPATCHER;
-        Process nextDispatch = enterQueue.get(nextDispatchIndex);
-        //Log the next running process's time and process ID
-        String nextDispatchLog = "T" + timer + ": " + nextDispatch.getPID();
-        dispatchLogs.add(nextDispatchLog);
-        return nextDispatch;
+        return readyQueue.get(nextDispatchIndex);
     }
     //Pre-condition:
     //Post-condition:
@@ -79,18 +106,18 @@ public class FCFS extends Scheduler
     public void run() 
     {
         int t1;
-        while(enterQueue.size() != 0)
+        while(finishedQueue.size() != enterQueue.size())
         {
             Process runningProcess = dispatch();
             t1 = timer;
-            runningProcess.setWaitTime(t1);
             while(runningProcess.getSrvTime() > timer-t1)
             {
                 timer++;
             }
             runningProcess.setTurnTime(timer-runningProcess.getArrTime());
+            runningProcess.setWaitTime(timer - runningProcess.getSrvTime());
             finishedQueue.add(runningProcess);
-            enterQueue.remove(runningProcess);
+            readyQueue.remove(runningProcess);
         }
     }
     
@@ -105,9 +132,9 @@ public class FCFS extends Scheduler
     //Pre-condition:
     //Post-condition:
     @Override
-    public ArrayList<Process> getFinishedQueue()
+    public ArrayList<Process> getEnterQueue()
     {
-        return finishedQueue;
+        return enterQueue;
     }
     //Pre-condition:
     //Post-condition:

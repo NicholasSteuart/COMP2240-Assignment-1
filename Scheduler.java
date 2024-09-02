@@ -17,7 +17,7 @@ abstract class Scheduler
     abstract public Process dispatch();
     abstract public void run();
     abstract public String getName();
-    abstract public ArrayList<Process> getFinishedQueue();
+    abstract public ArrayList<Process> getEnterQueue();
     abstract public ArrayList<String> getDispatchLogs();
 
     // CONCRETE METHODS //
@@ -31,14 +31,21 @@ abstract class Scheduler
             dispatchlogs += log + "\n";
         }
         dispatchlogs += "\n";
+        resetDispatchLogs();
         return dispatchlogs;
+    }
+    //Pre-condition: 
+    //Post-condition: 
+    public void resetDispatchLogs()
+    {
+        dispatchLogs.clear();
     }
     //Pre-condition: 
     //Post-condition: 
     public String getAverage(String dataType)
     {
         int sum = 0;
-        for(Process process: this.getFinishedQueue())
+        for(Process process: this.getEnterQueue())
         {
             if(dataType == "turnTime") 
             {
@@ -49,7 +56,7 @@ abstract class Scheduler
                 sum += process.getWaitTime();
             }
         }
-        double average = (double)sum / this.getFinishedQueue().size();
+        double average = (double)sum / this.getEnterQueue().size();
         return String.format("%.2f", average);
     }
 }

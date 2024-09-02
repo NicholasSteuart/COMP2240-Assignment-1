@@ -39,21 +39,6 @@ public class FBV extends Scheduler
     //Pre-condition:
     //Post-condition:
     @Override
-    public void admit()
-    {
-        /*for(Process process: enterQueue)
-        {
-            if(process.getArrTime() <= timer)
-            {
-                readyQueue.add(process);
-                System.out.println("PROCESS ADDED TO READY QUEUE: PID: " + process.getPID() + " ARRTIME: " + process.getArrTime() + " SRVTIME: " + process.getSrvTime() + " TICKETS: " + process.getTickets());
-            }
-        }
-        System.out.println("\n");*/
-    }
-    //Pre-condition:
-    //Post-condition:
-    @Override
     public Process dispatch()
     {
         Process nextProcess = readyQueue.get(0);
@@ -95,9 +80,9 @@ public class FBV extends Scheduler
     //Pre-condition:
     //Post-condition:
     @Override
-    public ArrayList<Process> getFinishedQueue()
+    public ArrayList<Process> getEnterQueue()
     {
-        return finishedQueue;
+        return enterQueue;
     }
     //Pre-condition:
     //Post-condition:

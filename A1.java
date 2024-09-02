@@ -8,7 +8,7 @@
 
 // PACKAGES //
 import java.io.File; 
-import java.io.FileNotFoundException;  
+import java.io.FileNotFoundException;
 import java.util.Scanner; 
 import java.util.ArrayList;
 
@@ -16,12 +16,14 @@ public class A1
 {
   public static void main(String[] args) throws Exception
   {
-    try 
+    //File file = new File(args[0]);
+    File file = new File(args[0]);
+    try (Scanner sc = new Scanner(file);)
     {
-      File file = new File(args[0]);
-      Scanner sc = new Scanner(file);
-
-      ArrayList<Process> data = new ArrayList<Process>();
+      ArrayList<Process> fcfsData = new ArrayList<Process>();
+      ArrayList<Process> srtData = new ArrayList<Process>();
+      ArrayList<Process> fbvData = new ArrayList<Process>();
+      ArrayList<Process> ltrData = new ArrayList<Process>();
       int dispatcher = 0;
       Process newProcess;
 
@@ -83,24 +85,26 @@ public class A1
             throw new Exception("Tickets must be a positive integer");
           }
         }
-        newProcess = new Process(pID, arrTime, srvTime, tickets);
-        data.add(newProcess);
+        //Implemented this way to avoid shallow copies of the data ArrayLists
+        fcfsData.add(new Process(pID, arrTime, srvTime, tickets));
+        srtData.add(new Process(pID, arrTime, srvTime, tickets));
+        fbvData.add(new Process(pID, arrTime, srvTime, tickets));
+        ltrData.add(new Process(pID, arrTime, srvTime, tickets));
         sc.next();
       }
       while(!sc.hasNext("BEGINRANDOM"));
-
       //TODO: IMPLEMENT RANDOM
-
       sc.close();
 
       // OUTPUT //
-      FCFS fcfs = new FCFS(data, dispatcher);
-      SRT srt = new SRT(data, dispatcher);
-      FBV fbv = new FBV(data, dispatcher);
-      LTR ltr = new LTR(data, dispatcher);
+
+      FCFS fcfs = new FCFS(fcfsData, dispatcher);
+      SRT srt = new SRT(srtData, dispatcher);
+      FBV fbv = new FBV(fbvData, dispatcher);
+      LTR ltr = new LTR(ltrData, dispatcher);
 
       fcfs.run();
-      //srt.run();
+      srt.run();
       //fbv.run();
       //ltr.run();
       
@@ -124,7 +128,7 @@ public class A1
   {
     String results = scheduler.printDispatchLogs();
     results += "Process  Turnaround Time  Waiting Time\n";
-    for(Process process: scheduler.getFinishedQueue())
+    for(Process process: scheduler.getEnterQueue())
     {
       results += String.format("%-8s %-16s %s", process.getPID(), process.getTurnTime(), process.getWaitTime()) + "\n";
     }

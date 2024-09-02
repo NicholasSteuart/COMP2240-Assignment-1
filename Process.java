@@ -9,7 +9,7 @@ public class Process
     // CLASS VARIABLES //
 
     private String pID;
-    private int arrTime, srvTime, tickets; 
+    private int arrTime, srvTime, tickets, timeRemaining; 
     private int turnTime = 0, waitTime = 0;
 
     // CONSTRUCTORS //
@@ -22,6 +22,7 @@ public class Process
         arrTime = 0;
         srvTime = 0;
         tickets = 0;
+        timeRemaining = 0;
     }
     //Pre-condition:
     //Post-condition:
@@ -31,6 +32,7 @@ public class Process
         this.arrTime = arrTime;
         this.srvTime = srvTime;
         this.tickets = tickets;
+        timeRemaining = srvTime;
     }
 
     // MUTATORS //
@@ -71,7 +73,12 @@ public class Process
     {
         this.waitTime = waitTime;
     }
-
+    //Pre-condition:
+    //Post-condition:
+    public void setTimeRemaining(int timeRemaining)
+    {
+        this.timeRemaining = timeRemaining;
+    }
     // ACCESSORS //
 
     //Pre-condition:
@@ -110,4 +117,11 @@ public class Process
     {
         return waitTime;
     }
+    //Pre-condition:
+    //Post-condition:
+    public int getTimeRemaining()
+    {
+        return timeRemaining;
+    }
+
 }

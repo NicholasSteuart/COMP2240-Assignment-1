@@ -15,9 +15,10 @@ public class SRT extends Scheduler
     private ArrayList<Process> enterQueue;
     private ArrayList<Process> readyQueue = new ArrayList<Process>();
     private ArrayList<Process> finishedQueue = new ArrayList<Process>();
-    private int dispatcher;
+    private int DISPATCHER;
     private int timer = 0;
     private String name = "SRT";
+    private boolean[] visited;
 
     // CONSTRUCTORS //
     //Pre-condition:
@@ -25,63 +26,94 @@ public class SRT extends Scheduler
     public SRT() 
     {
         enterQueue = new ArrayList<Process>();
-        dispatcher = 0;
+        DISPATCHER = 0;
+        visited = new boolean[0];
     }
     //Pre-condition:
     //Post-condition:
     public SRT(ArrayList<Process> enterQueue, int dispatcher)
     {
         this.enterQueue = enterQueue;
-        this.dispatcher = dispatcher;
+        this.DISPATCHER = dispatcher;
+        visited = new boolean[enterQueue.size()];
     }
 
     // METHODS //
     //Pre-condition:
     //Post-condition:
     @Override
-    public void admit()
-    {
-        /*for(Process process: enterQueue)
-        {
-            if(process.getArrTime() <= timer)
-            {
-                readyQueue.add(process);
-                System.out.println("PROCESS ADDED TO READY QUEUE: PID: " + process.getPID() + " ARRTIME: " + process.getArrTime() + " SRVTIME: " + process.getSrvTime() + " TICKETS: " + process.getTickets());
-            }
-        }
-        System.out.println("\n");*/
+    public Process dispatch()
+    {   
+        admit();   //Admit ready processes to readyQueue
+        Process nextDispatch = findSRT();    //Finds process with Shortest Remaining Time in readyQueue
+        timer += DISPATCHER;
+        //Log the next running process's time and process ID
+        String nextDispatchLog = "T" + timer + ": " + nextDispatch.getPID();
+        dispatchLogs.add(nextDispatchLog);
+        return nextDispatch;
     }
     //Pre-condition:
     //Post-condition:
-    @Override
-    public Process dispatch()
+    public void admit()
     {
-        Process nextProcess = readyQueue.get(0);
-        /*readyQueue.remove(0);
-        timer += dispatcher;
-        String dispatchLog = "T" + timer + ": " + nextProcess.getPID();
-        dispatchLogs.add(dispatchLog);*/
-        return nextProcess;
+        for(int i = 0; i < enterQueue.size(); i++)
+        {
+            if(enterQueue.get(i).getArrTime() <= timer && !visited[i])
+            {
+                readyQueue.add(enterQueue.get(i));
+                visited[i] = true;
+            } 
+        }
+    }
+    //Pre-condition:
+    //Post-condition:
+    public Process findSRT()
+    {
+        int shortestRemainingTime = Integer.MAX_VALUE;
+        int nextDispatchIndex = 0;
+
+        for(int i = 0; i < readyQueue.size(); i++)
+        {
+            if(shortestRemainingTime > readyQueue.get(i).getTimeRemaining())
+            {
+                shortestRemainingTime = readyQueue.get(i).getTimeRemaining();
+                nextDispatchIndex = i;
+            }
+            if(shortestRemainingTime == readyQueue.get(i).getTimeRemaining())
+            {
+                int id1 = Integer.parseInt(readyQueue.get(i).getPID().substring(1));
+                int id2 = Integer.parseInt(readyQueue.get(nextDispatchIndex).getPID().substring(1));
+
+                if(id1 < id2)
+                {
+                    shortestRemainingTime = readyQueue.get(i).getTimeRemaining();
+                    nextDispatchIndex = i;
+                }
+            }
+        }
+        return readyQueue.get(nextDispatchIndex);
     }
     //Pre-condition:
     //Post-condition:
     @Override
     public void run() 
     {
-        /*int t1;
-        while(enterQueue.size() > finishedQueue.size())
+        while(finishedQueue.size() != enterQueue.size())
         {
-            admit();
             Process runningProcess = dispatch();
-            t1 = timer;
-            runningProcess.setWaitTime(t1);
-            while(runningProcess.getSrvTime() > timer-t1)
+
+            runningProcess.setTimeRemaining(runningProcess.getTimeRemaining() - 1);  
+            timer++; 
+
+            if(runningProcess.getTimeRemaining() == 0)
             {
-                timer++;
+                runningProcess.setTurnTime(timer - runningProcess.getArrTime());
+                runningProcess.setWaitTime(timer - runningProcess.getSrvTime());
+                finishedQueue.add(runningProcess);
+                readyQueue.remove(runningProcess);   
             }
-            runningProcess.setTurnTime(timer-runningProcess.getArrTime());
-            finishedQueue.add(runningProcess);
-        }*/
+            
+        }
     }
     
     // ACCESSORS //
@@ -95,9 +127,9 @@ public class SRT extends Scheduler
     //Pre-condition:
     //Post-condition:
     @Override
-    public ArrayList<Process> getFinishedQueue()
+    public ArrayList<Process> getEnterQueue()
     {
-        return finishedQueue;
+        return enterQueue;
     }
     //Pre-condition:
     //Post-condition:
