@@ -115,7 +115,7 @@ public class FCFS extends Scheduler
                 timer++;
             }
             runningProcess.setTurnTime(timer-runningProcess.getArrTime());
-            runningProcess.setWaitTime(timer - runningProcess.getSrvTime());
+            runningProcess.setWaitTime(timer - (runningProcess.getArrTime() + runningProcess.getSrvTime()));
             finishedQueue.add(runningProcess);
             readyQueue.remove(runningProcess);
         }

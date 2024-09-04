@@ -44,7 +44,6 @@ public class SRT extends Scheduler
     @Override
     public Process dispatch()
     {   
-        admit();   //Admit ready processes to readyQueue
         Process nextDispatch = findSRT();    //Finds process with Shortest Remaining Time in readyQueue
         timer += DISPATCHER;
         //Log the next running process's time and process ID
@@ -98,22 +97,42 @@ public class SRT extends Scheduler
     @Override
     public void run() 
     {
+        admit();                             //Admit ready processes to readyQueue
+        Process runningProcess = dispatch();
         while(finishedQueue.size() != enterQueue.size())
         {
-            Process runningProcess = dispatch();
-
+            admit();   
+            if(isPreempted(runningProcess))
+            {
+                runningProcess = dispatch();
+            } 
             runningProcess.setTimeRemaining(runningProcess.getTimeRemaining() - 1);  
             timer++; 
-
             if(runningProcess.getTimeRemaining() == 0)
             {
                 runningProcess.setTurnTime(timer - runningProcess.getArrTime());
-                runningProcess.setWaitTime(timer - runningProcess.getSrvTime());
+                runningProcess.setWaitTime(timer - (runningProcess.getArrTime() + runningProcess.getSrvTime()));
                 finishedQueue.add(runningProcess);
                 readyQueue.remove(runningProcess);   
             }
-            
         }
+    }
+    //Pre-condition:
+    //Post-condition:
+    public boolean isPreempted(Process runningProcess)
+    {
+        if(readyQueue.size() == 0)
+        {
+            return false;
+        }
+        else
+        {
+            if(runningProcess != findSRT())
+            {
+                return true;
+            }
+        }
+        return false;
     }
     
     // ACCESSORS //
