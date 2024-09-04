@@ -46,9 +46,7 @@ public class LTR extends Scheduler
     @Override
     public Process dispatch()
     {
-        Process nextProcess = readyQueue.get(0);
-        //int totalTickets = getTotalTickets();
-
+        Process nextProcess = runLottery(getTotalTickets());
 
         timer += DISPATCHER;
         String dispatchLog = "T" + timer + ": " + nextProcess.getPID();
@@ -57,7 +55,36 @@ public class LTR extends Scheduler
     }
     //Pre-condition:
     //Post-condition:
-    
+    public int getTotalTickets()
+    {
+        int totalTickets = 0;   //Value must be reset due to fluctuation of the ready queue's processes.
+        for(Process process: readyQueue)
+        {
+            totalTickets += process.getTickets();
+        }
+        return totalTickets;
+    }
+    //Pre-condition:
+    //Post-condition:
+    public Process runLottery(int totalTickets)
+    {
+        int winningTicket = randomNums.get(0) % totalTickets;
+        int counter = 0;
+        Process nextProcess = null;
+        for(Process process: readyQueue)
+        {                                           //Original datafile1.txt tickets: 400, 100, 150, 200, 250
+            counter += process.getTickets();        //Original datafile2.txt tickets: 16, 1, 7, 19, 10
+            if(counter > winningTicket)
+            {
+                nextProcess = process;
+                break;
+            }
+        }
+        System.out.println("TIMER: " + timer + " RANDOMNUMBER: " + randomNums.get(0) + " TOTALTICKETS: " + totalTickets + " WINNINGTICKET: " + winningTicket + " WINNING PROCESS: " + nextProcess.getPID());
+        randomNums.remove(0);
+
+        return nextProcess;
+    }
     //Pre-condition:
     //Post-condition:
     @Override
@@ -77,7 +104,34 @@ public class LTR extends Scheduler
     @Override
     public void run() 
     {
-        
+        while(finishedQueue.size() != enterQueue.size())
+        {
+            admit();
+            Process runningProcess = dispatch();
+            if(runningProcess.getTimeRemaining() > 3)
+            {
+                runningProcess.setTimeRemaining(runningProcess.getTimeRemaining() - 3);
+                for(int i = 0; i < 3; i++)
+                {
+                    timer++;
+                    admit();
+                }
+                Process removed = readyQueue.remove(readyQueue.indexOf(runningProcess));
+                readyQueue.add(removed);
+            }
+            else
+            {
+                for(int i = 0; i < runningProcess.getTimeRemaining(); i++)
+                {
+                    timer++;
+                    admit();
+                }
+                runningProcess.setTurnTime(timer - runningProcess.getArrTime());
+                runningProcess.setWaitTime(timer - (runningProcess.getArrTime() + runningProcess.getSrvTime()));
+                finishedQueue.add(runningProcess);
+                readyQueue.remove(runningProcess);
+            }
+        }
     }
     
     // ACCESSORS //

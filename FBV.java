@@ -110,7 +110,12 @@ public class FBV extends Scheduler
         if(runningProcess.getTimeRemaining() > timeSlice)
         {
             runningProcess.setTimeRemaining(runningProcess.getTimeRemaining() - timeSlice);
-            timer += timeSlice;
+            for(int i = 0; i < timeSlice; i++)
+            {
+                timer++;
+                admit();
+            }
+            
             if(runningProcess.getPriority() == 1)
             {
                 runningProcess.setPriority(2);
@@ -126,7 +131,11 @@ public class FBV extends Scheduler
         }
         else
         {
-            timer += runningProcess.getTimeRemaining();
+            for(int i = 0; i < runningProcess.getTimeRemaining(); i++)
+            {
+                timer++;
+                admit();
+            }
             runningProcess.setTurnTime(timer - runningProcess.getArrTime());
             runningProcess.setWaitTime(timer - (runningProcess.getArrTime() + runningProcess.getSrvTime()));
             if(runningProcess.getPriority() == 1)

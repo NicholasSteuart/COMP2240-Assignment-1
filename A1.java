@@ -20,7 +20,6 @@ public class A1
     try (Scanner sc = new Scanner(file);)
     {       
       int dispatcher = 0;
-      Process newProcess;
 
       ArrayList<Process> fcfsData = new ArrayList<Process>();
       ArrayList<Process> srtData = new ArrayList<Process>();
