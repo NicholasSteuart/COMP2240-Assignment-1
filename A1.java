@@ -94,6 +94,16 @@ public class A1
         sc.next();
       }
       while(!sc.hasNext("BEGINRANDOM"));
+
+      if(sc.hasNext("BEGINRANDOM"))
+      {
+        sc.next();
+        while(!sc.hasNext("ENDRANDOM"))
+        {
+          randomNums.add(sc.nextInt());
+        }
+      }
+      
       sc.close();
 
       // OUTPUT //
@@ -101,12 +111,12 @@ public class A1
       FCFS fcfs = new FCFS(fcfsData, dispatcher);
       SRT srt = new SRT(srtData, dispatcher);
       FBV fbv = new FBV(fbvData, dispatcher);
-      LTR ltr = new LTR(ltrData, dispatcher);
+      LTR ltr = new LTR(ltrData, dispatcher, randomNums);
 
       fcfs.run();
       srt.run();
       fbv.run();
-      //ltr.run();
+      ltr.run();
       
       System.out.print(printResults(fcfs));
       System.out.print(printResults(srt));

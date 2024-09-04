@@ -79,7 +79,6 @@ public class FBV extends Scheduler
                 visited[i] = true;
             } 
         }
-
     }
     //Pre-condition:
     //Post-condition:
