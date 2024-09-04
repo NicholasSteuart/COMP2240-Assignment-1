@@ -15,6 +15,7 @@ abstract class Scheduler
 
     // ABSTRACT METHODS //
     abstract public Process dispatch();
+    abstract public void admit();
     abstract public void run();
     abstract public String getName();
     abstract public ArrayList<Process> getEnterQueue();

@@ -55,6 +55,7 @@ public class FCFS extends Scheduler
     }
     //Pre-condition:
     //Post-condition:
+    @Override
     public void admit()
     {
         for(int i = 0; i < enterQueue.size(); i++)

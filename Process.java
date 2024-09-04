@@ -10,7 +10,7 @@ public class Process
 
     private String pID;
     private int arrTime, srvTime, tickets, timeRemaining; 
-    private int turnTime = 0, waitTime = 0;
+    private int turnTime = 0, waitTime = 0, priority = 1;
 
     // CONSTRUCTORS //
 
@@ -79,6 +79,12 @@ public class Process
     {
         this.timeRemaining = timeRemaining;
     }
+    //Pre-condition:
+    //Post-condition:
+    public void setPriority(int priority)
+    {
+        this.priority = priority;
+    }
     // ACCESSORS //
 
     //Pre-condition:
@@ -123,5 +129,10 @@ public class Process
     {
         return timeRemaining;
     }
-
+    //Pre-condition:
+    //Post-condition:
+    public int getPriority()
+    {
+        return priority;
+    }
 }

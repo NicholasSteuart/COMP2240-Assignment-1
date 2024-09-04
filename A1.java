@@ -105,7 +105,7 @@ public class A1
 
       fcfs.run();
       srt.run();
-      //fbv.run();
+      fbv.run();
       //ltr.run();
       
       System.out.print(printResults(fcfs));
