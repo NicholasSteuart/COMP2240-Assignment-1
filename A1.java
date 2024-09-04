@@ -16,16 +16,17 @@ public class A1
 {
   public static void main(String[] args) throws Exception
   {
-    //File file = new File(args[0]);
     File file = new File(args[0]);
     try (Scanner sc = new Scanner(file);)
-    {
+    {       
+      int dispatcher = 0;
+      Process newProcess;
+
       ArrayList<Process> fcfsData = new ArrayList<Process>();
       ArrayList<Process> srtData = new ArrayList<Process>();
       ArrayList<Process> fbvData = new ArrayList<Process>();
       ArrayList<Process> ltrData = new ArrayList<Process>();
-      int dispatcher = 0;
-      Process newProcess;
+      ArrayList<Integer> randomNums = new ArrayList<Integer>();
 
       // READING IN FILE //
       if(sc.hasNext("BEGIN"))
@@ -93,7 +94,6 @@ public class A1
         sc.next();
       }
       while(!sc.hasNext("BEGINRANDOM"));
-      //TODO: IMPLEMENT RANDOM
       sc.close();
 
       // OUTPUT //

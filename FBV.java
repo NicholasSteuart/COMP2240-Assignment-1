@@ -148,10 +148,19 @@ public class FBV extends Scheduler
     public void executeRoundRobin(Process runningProcess, int timeSlice)
     {
         runningProcess = lowPriorityQueue.get(0);
+        runningProcess.setStarvationTime(runningProcess.getStarvationTime() + timeSlice);
         if(runningProcess.getTimeRemaining() > timeSlice)
         {
             runningProcess.setTimeRemaining(runningProcess.getTimeRemaining() - timeSlice);
             timer += timeSlice;
+
+            //Priority Boost Process to Highest Priority Queue if it has spent more than 16 time units in the Low Priority Queue
+            if(runningProcess.getStarvationTime() > 16)
+            {
+                runningProcess.setPriority(1);
+                highPriorityQueue.add(runningProcess);
+                lowPriorityQueue.remove(runningProcess);
+            }
         }
         else
         {
